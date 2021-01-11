@@ -400,7 +400,7 @@ output_notebook()
 
 <div class="bk-root">
     <a href="https://bokeh.org" target="_blank" class="bk-logo bk-logo-small bk-logo-notebook"></a>
-    <span id="1109">Loading BokehJS ...</span>
+    <span id="1001">Loading BokehJS ...</span>
 </div>
 
 
@@ -472,7 +472,7 @@ show(p)
 
 
 
-<div class="bk-root" id="5291f503-e1f3-4ec1-a9c4-2fd889a71805" data-root-id="1111"></div>
+<div class="bk-root" id="79c299d7-65b4-4fbe-b1ff-ee4dd4a47e96" data-root-id="1003"></div>
 
 
 
