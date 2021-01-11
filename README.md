@@ -6,8 +6,6 @@ import numpy as np
 from shapely.geometry import Point
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
-from shapely import wkt
-
 ```
 
 List of Indiana's Babyfriendly hospitals downloaded from ISDH
@@ -27,7 +25,19 @@ geo_df.head()
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
 
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -125,17 +135,11 @@ geo_df.head()
 
 ```python
 geo_df.plot()
+plt.show()
 ```
 
 
-
-
-    <AxesSubplot:>
-
-
-
-
-![png](output_4_1.png)
+![png](output_4_0.png)
 
 
 The IN Counties shapefiles downloaded from: https://maps.indiana.edu/layerGallery.html?category=Census
@@ -151,6 +155,19 @@ in_cou.head()
 
 
 <div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -366,6 +383,99 @@ plt.show()
 
 
 ![png](output_12_0.png)
+
+
+Make an interactive map of Indiana counties
+
+
+```python
+from bokeh.io import show, output_notebook
+from bokeh.plotting import figure
+from bokeh.sampledata.us_counties import data as counties
+from bokeh.models import ColumnDataSource, HoverTool, LogColorMapper, GeoJSONDataSource
+output_notebook()
+```
+
+
+
+<div class="bk-root">
+    <a href="https://bokeh.org" target="_blank" class="bk-logo bk-logo-small bk-logo-notebook"></a>
+    <span id="1109">Loading BokehJS ...</span>
+</div>
+
+
+
+
+
+```python
+def getPolyCoords(row, geom, coord_type):
+    """Returns the coordinates ('x' or 'y') of edges of a Polygon exterior"""
+
+    # Parse the exterior of the coordinate
+    exterior = row[geom].exterior
+
+    if coord_type == 'x':
+        # Get the x coordinates of the exterior
+        return list( exterior.coords.xy[0] )
+    elif coord_type == 'y':
+        # Get the y coordinates of the exterior
+        return list( exterior.coords.xy[1] )
+
+in_cou['x'] = in_cou.apply(getPolyCoords, geom='geometry', coord_type='x', axis=1)
+in_cou['y'] = in_cou.apply(getPolyCoords, geom='geometry', coord_type='y', axis=1)
+```
+
+
+```python
+county_df = GeoJSONDataSource(geojson=in_cou.to_json())
+```
+
+
+```python
+#USE THE FOLLOWING LINE FOR BOKEH SAMPLE MAP DATA.
+#counties = {
+#    code: county for code, county in counties.items() if county["state"] == "in"
+#}
+
+#county_xs = [county["lons"] for county in counties.values()]
+#county_ys = [county["lats"] for county in counties.values()]
+
+#county_names = [county['name'] for county in counties.values()]
+
+#data=dict(
+#    x=county_xs,
+#    y=county_ys,
+#)
+
+TOOLS = "pan,wheel_zoom,reset,hover,save"
+
+
+p = figure(
+    title="IN Counties Map", tools=TOOLS,
+    x_axis_location=None, y_axis_location=None,
+    tooltips=[
+        ("Name", "@NAME_L"), ("(Long, Lat)", "($x, $y)")
+    ])
+
+p.grid.grid_line_color = None
+p.hover.point_policy = "follow_mouse"
+
+p.patches('x', 'y', source= county_df, fill_color="#fb9a99", fill_alpha=0.7, line_color="white", line_width=0.5)
+
+show(p)
+```
+
+
+
+
+
+
+
+
+<div class="bk-root" id="5291f503-e1f3-4ec1-a9c4-2fd889a71805" data-root-id="1111"></div>
+
+
+
 
 
 
